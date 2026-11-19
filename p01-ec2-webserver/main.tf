@@ -67,8 +67,9 @@ resource "aws_instance" "web" {
   subnet_id              = aws_subnet.my_subnet.id
   vpc_security_group_ids = [aws_security_group.web_sg.id]
   user_data              = file("install.sh")
-  tags = {
-    Name = "aman-web-server"
+    tags = {
+    Name        = "aman-web-server"
+    Environment = "dev"
   }
 }
 

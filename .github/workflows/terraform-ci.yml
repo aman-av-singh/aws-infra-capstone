@@ -1,0 +1,27 @@
+name: Terraform CI
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform format check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform validate (every project folder)
+        run: |
+          for dir in $(find . -name "main.tf" -not -path "*/.terraform/*" -exec dirname {} \; | sort); do
+            echo "===== $dir ====="
+            terraform -chdir=$dir init -backend=false -input=false
+            terraform -chdir=$dir validate
+          done

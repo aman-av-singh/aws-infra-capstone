@@ -1,0 +1,36 @@
+name: Docker Build and Push to ECR
+
+on:
+  push:
+    paths:
+      - "p08-docker-app/**"
+      - ".github/workflows/docker-ecr.yml"
+  workflow_dispatch:
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Log in to ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build image
+        run: |
+          docker build -t ${{ steps.ecr.outputs.registry }}/aman-p13-web:${{ github.sha }} p08-docker-app
+          docker tag ${{ steps.ecr.outputs.registry }}/aman-p13-web:${{ github.sha }} ${{ steps.ecr.outputs.registry }}/aman-p13-web:latest
+
+      - name: Push image
+        run: |
+          docker push ${{ steps.ecr.outputs.registry }}/aman-p13-web:${{ github.sha }}
+          docker push ${{ steps.ecr.outputs.registry }}/aman-p13-web:latest

@@ -1,0 +1,47 @@
+name: Terraform Plan
+
+on:
+  push:
+    paths:
+      - "p12-p18-pipeline-infra/**"
+      - ".github/workflows/terraform-plan.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "p12-p18-pipeline-infra/**"
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: p12-p18-pipeline-infra
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-west-1
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform init
+        run: terraform init -input=false
+
+      - name: Terraform plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Save plan as text
+        run: terraform show -no-color tfplan > plan.txt
+
+      - name: Upload plan artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: |
+            p12-p18-pipeline-infra/tfplan
+            p12-p18-pipeline-infra/plan.txt

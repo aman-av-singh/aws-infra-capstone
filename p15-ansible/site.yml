@@ -1,0 +1,22 @@
+- name: Configure web server with Ansible
+  hosts: localhost
+  connection: local
+  become: true
+
+  tasks:
+    - name: Install nginx
+      ansible.builtin.dnf:
+        name: nginx
+        state: present
+
+    - name: Copy my web page
+      ansible.builtin.copy:
+        src: index.html
+        dest: /usr/share/nginx/html/index.html
+        mode: "0644"
+
+    - name: Start nginx and enable it at boot
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true

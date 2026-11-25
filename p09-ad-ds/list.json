@@ -1,0 +1,8 @@
+{
+  "commands": [
+    "Get-ADOrganizationalUnit -Filter * | Format-Table Name, DistinguishedName -AutoSize | Out-String",
+    "Get-ADUser -Filter * -SearchBase 'OU=Capstone,DC=aman,DC=local' | Format-Table Name, Enabled -AutoSize | Out-String",
+    "Get-ADGroupMember Developers | Format-Table Name | Out-String",
+    "Get-ADGroupMember 'Domain Admins' | Format-Table Name | Out-String"
+  ]
+}

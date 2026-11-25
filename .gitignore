@@ -4,3 +4,4 @@
 *.tfvars
 crash.log
 *.pem
+p09-ad-ds/users.json

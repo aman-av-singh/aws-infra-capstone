@@ -1,0 +1,30 @@
+name: Terraform Apply (GitOps)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "p12-p18-pipeline-infra/**"
+      - ".github/workflows/terraform-apply.yml"
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: p12-p18-pipeline-infra
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: eu-west-1
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: Terraform init
+        run: terraform init -input=false
+      - name: Terraform apply
+        run: terraform apply -input=false -auto-approve
